@@ -14,6 +14,15 @@ EXPERIENCE_LEVELS = (
     "более 6 лет"
 )
 
+TECH_STACK = {
+    "languages": ["Python", "JavaScript", "Java", "C#", "C++",
+                  "Ruby", "Go", "Kotlin", "Swift", "PHP"],
+    "frameworks": ["Django", "Flask", "React", "Angular", "Vue.js",
+                   "Spring", "Rails", "ASP.NET", "Qt", "Bootstrap"],
+    "apis": ["REST", "GraphQL", "SOAP", "Firebase", "AWS", "SQLite",
+             "Twilio", "Stripe", "Docker"]
+}
+
 
 def cleanup():
     if os.path.exists(DB_NAME):
@@ -24,6 +33,17 @@ def cleanup():
 
 
 atexit.register(cleanup)
+
+
+def generate_random_stack():
+    """Генерирует случайный стек из словаря TECH_STACK."""
+    languages = (random.sample(TECH_STACK["languages"],
+                               k=random.randint(1, 3)))
+    frameworks = (random.sample(TECH_STACK["frameworks"],
+                                k=random.randint(1, 2)))
+    apis = (random.sample(TECH_STACK["apis"],
+                          k=random.randint(1, 2)))
+    return ", ".join(languages + frameworks + apis)
 
 
 def generate_database_and_resumes():
@@ -49,6 +69,7 @@ def generate_database_and_resumes():
         experience TEXT,
         desired_salary INTEGER,
         email TEXT,
+        stack TEXT,
         response TEXT
     )
     """)
@@ -62,7 +83,7 @@ def generate_database_and_resumes():
     )
     """)
 
-    for _ in range(100):
+    for _ in range(200):
         gender = random.choice(["male", "female"])
 
         if gender == "male":
@@ -77,6 +98,7 @@ def generate_database_and_resumes():
         experience = random.choice(EXPERIENCE_LEVELS)
         desired_salary = random.randrange(50000, 200001, 5000)
         email = f"{fake_en.user_name()}@example.com"
+        stack = generate_random_stack()
         response = ""
 
         cursor.execute("""
@@ -87,9 +109,10 @@ def generate_database_and_resumes():
                        experience,
                        desired_salary,
                        email,
+                       stack,
                        response
                     )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             first_name,
             last_name,
@@ -97,6 +120,7 @@ def generate_database_and_resumes():
             experience,
             desired_salary,
             email,
+            stack,
             response
         ))
 
@@ -106,6 +130,7 @@ def generate_database_and_resumes():
             f"Стаж работы: {experience}\n"
             f"Желаемая зарплата: {desired_salary} рублей\n"
             f"Email: {email}\n"
+            f"Стек технологий: {stack}\n"
         )
         with open(os.path.join(
             RESUMES_FOLDER,
