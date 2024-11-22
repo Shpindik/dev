@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, Toplevel
 import sqlite3
 import database
 import vacancies
@@ -162,6 +162,12 @@ def open_resume(event):
         text="Обновить статус",
         command=lambda: update_candidate_status(first_name, last_name))
     update_button.pack(padx=10, pady=10)
+    close_button = tk.Button(
+        resume_window,
+        text="Закрыть",
+        command=resume_window.destroy
+    )
+    close_button.pack(pady=10)
 
 
 def update_candidate_status(first_name, last_name):
@@ -200,15 +206,40 @@ def update_candidate_status(first_name, last_name):
         )
     finally:
         connection.close()
+
     update_candidates()
 
 
-# Интерфейс приложения
+def show_about():
+    try:
+        with open("about.txt", "r", encoding="utf-8") as file:
+            about_content = file.read()
+    except FileNotFoundError:
+        about_content = "Файл 'about.txt' не найден."
+
+    about_window = Toplevel()
+    about_window.title("О программе")
+
+    text_widget = tk.Text(about_window, wrap="word", height=20, width=60)
+    text_widget.insert(tk.END, about_content)
+    text_widget.config(state=tk.DISABLED)
+    text_widget.pack(padx=10, pady=10)
+
+    close_button = tk.Button(
+        about_window,
+        text="Закрыть",
+        command=about_window.destroy
+    )
+    close_button.pack(pady=10)
+
+
 root = tk.Tk()
 root.title("HR Симулятор")
 root.protocol("WM_DELETE_WINDOW", lambda: (root.destroy()))
 
-# ----- Фильтры -----
+about_button = tk.Button(root, text="О программе", command=show_about)
+about_button.pack(side="bottom", pady=10)
+
 acceptance_var = tk.BooleanVar(value=False)
 filter_frame = tk.Frame(root)
 filter_frame.pack(pady=10)
