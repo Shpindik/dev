@@ -125,6 +125,27 @@ def update_vacancies():
             values=(title, experience, salary, stack))
 
 
+def export_resume_to_disk(resume_filename, full_name):
+    """Экспорт резюме на диск."""
+    from tkinter.filedialog import asksaveasfilename
+
+    save_path = asksaveasfilename(
+        initialfile=f"{full_name.replace(' ', '_')}.txt",
+        defaultextension=".txt",
+        filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+    )
+
+    if save_path:
+        try:
+            with open(resume_filename, "r", encoding="utf-8") as src_file:
+                content = src_file.read()
+            with open(save_path, "w", encoding="utf-8") as dest_file:
+                dest_file.write(content)
+            messagebox.showinfo("Успех", f"Резюме сохранено в {save_path}")
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Не удалось сохранить резюме: {e}")
+
+
 def open_resume(event):
     selected_item = candidates_tree.selection()
     if not selected_item:
@@ -162,6 +183,11 @@ def open_resume(event):
         text="Обновить статус",
         command=lambda: update_candidate_status(first_name, last_name))
     update_button.pack(padx=10, pady=10)
+    export_button = tk.Button(
+        resume_window,
+        text="Экспортировать резюме",
+        command=lambda: export_resume_to_disk(resume_filename, full_name))
+    export_button.pack(padx=10, pady=5)
     close_button = tk.Button(
         resume_window,
         text="Закрыть",
